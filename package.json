@@ -1,0 +1,17 @@
+{
+  "name": "spotifind",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "auth": "node src/spotauth.js",
+    "fetch:songs": "node src/songs.js",
+    "fetch:lyrics": "node src/lyrics.js",
+    "sync:library": "npm run fetch:songs && npm run fetch:lyrics"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "open": "^10.1.0",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}
