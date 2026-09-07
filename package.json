@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "auth": "node src/spotauth.js",
-    "fetch:songs": "node src/songs.js",
-    "fetch:lyrics": "node src/lyrics.js",
-    "sync:library": "npm run fetch:songs && npm run fetch:lyrics"
+    "auth": "node backend/spotauth.js",
+    "fetch:songs": "node backend/songs.js",
+    "fetch:lyrics": "node backend/lyrics.js",
+    "sync:library": "npm run fetch:songs && npm run fetch:lyrics",
+    "serve:webapp": "python3 -m http.server 8000"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

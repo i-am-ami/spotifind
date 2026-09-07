@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpotiFind</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app">
+<main class="main">
+      <section class="hero">
+        <h1>SpotiFind</h1>
+        <p>
+          Search all of Spotify or choose one of your playlists to find songs
+          containing a word or phrase.
+        </p>
+      </section>
+
+      <section class="search-wrap">
+        <div class="filters-row">
+          <label class="filter-field" for="scopeSelect">
+            <span class="sr-only">Playlist</span>
+            <select class="scope-select" id="scopeSelect">
+              <option value="spotify">All Spotify</option>
+              <option value="liked"> Liked Songs ♥ </option>
+            </select>
+          </label>
+
+          <label class="filter-field" for="artistFilter">
+            <span class="sr-only">Artist</span>
+            <input class="filter-input" id="artistFilter" type="text" placeholder="Filter by artist" autocomplete="off" />
+          </label>
+
+          <label class="filter-field" for="albumFilter">
+            <span class="sr-only">Album</span>
+            <input class="filter-input" id="albumFilter" type="text" placeholder="Filter by album" autocomplete="off" />
+          </label>
+        </div>
+
+        <form id="searchForm" class="search-bar">
+          <span class="search-icon">⌕</span>
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Try love, dream, night..."
+            value="love"
+            autocomplete="off"
+          />
+
+          <button id="clearButton" class="clear-btn" type="button" aria-label="Clear search">×</button>
+          <button class="search-btn" type="submit">Search</button>
+        </form>
+
+      <p class="selected-playlist">
+          Searching in:
+          <strong id="filterSummary">All Spotify</strong>
+        </p>
+      </section>
+
+      <section class="results-area">
+        <div class="results-top">
+          <div id="resultCount" class="count">4 songs found</div>
+
+          <label class="sort-wrap">
+            Sort by:
+            <select id="sortSelect">
+              <option value="relevance">Relevance</option>
+              <option value="title">Title</option>
+              <option value="artist">Artist</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="results" class="results"></div>
+
+        <div class="footer-note"> Keep searching. There’s a song for every word. </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
