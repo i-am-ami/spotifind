@@ -1,0 +1,79 @@
+[
+  {
+    "id": "3Wrjm47oTz2sjIgck11l5e",
+    "name": "Beggin'",
+    "artists": ["Måneskin"],
+    "album": "Chosen",
+    "duration_ms": 211560,
+    "spotifyUrl": "https://open.spotify.com/track/3Wrjm47oTz2sjIgck11l5e",
+    "liked": true,
+    "playlists": [],
+    "_note": "Prefix matching: unquoted 'beg' should match the token 'beggin''. Also shows that a trailing apostrophe is part of the token, so quoted \"beggin\" (no apostrophe) will NOT exact-match \"beggin'\" -- a real quirk worth knowing about, not something the tests should silently paper over."
+  },
+  {
+    "id": "11M8c9SHQYpd8DOrmcu25k",
+    "name": "Beg for You (feat. Rina Sawayama)",
+    "artists": ["Charli xcx", "Rina Sawayama"],
+    "album": "CRASH",
+    "duration_ms": 168053,
+    "spotifyUrl": "https://open.spotify.com/track/11M8c9SHQYpd8DOrmcu25k",
+    "liked": true,
+    "playlists": [{ "id": "3b9jTcSGEwBOZJbLZr89o8", "name": "going 99 on the 101  (dawn)" }],
+    "_note": "Exact quoted match: \"beg\" should match the standalone word 'beg' here (no trailing apostrophe), unlike Beggin'. Also covers: punctuation touching a match word ('you (' / 'you)'), a repeated 3-word phrase for matchCount (>1), case-insensitivity ('Beg' vs query 'beg'), a multi-artist song, and playlist membership (one playlist)."
+  },
+  {
+    "id": "70pVCVMGjmIWPbWXDwf11e",
+    "name": "petal",
+    "artists": ["Ariana Grande"],
+    "album": "petal",
+    "duration_ms": 184248,
+    "spotifyUrl": "https://open.spotify.com/track/70pVCVMGjmIWPbWXDwf11e",
+    "liked": true,
+    "playlists": [],
+    "_note": "Four things at once: (1) 'again' / 'They' sit on either side of a line break -- query 'again they' should still match. (2) 'I don't need someone to save me' is a NEGATIVE case: query 'need to save' must NOT match, since 'someone' sits between 'need' and 'to save' (word-order/adjacency is required, not just word presence). (3) 'Heartbreak won't bite' and 'Petal in the pavement' each appear twice -- matchCount should reflect that. (4) The title 'petal' ALSO appears inside the lyrics ('Petal in the pavement') -- query 'petal' should sum matches from both title and lyrics, and the returned snippet should come from the lyrics, not the title (per lyricMatches[0] ?? titleMatches[0])."
+  },
+  {
+    "id": "1Gc4HLasqihMmsAJQacNuO",
+    "name": "POP GIRL (with BAYLI & Isabella Lovestory)",
+    "artists": ["Lexie Liu", "BAYLI", "Isabella Lovestory"],
+    "album": "POP GIRLS CLUB",
+    "duration_ms": 173016,
+    "spotifyUrl": "https://open.spotify.com/track/1Gc4HLasqihMmsAJQacNuO",
+    "liked": true,
+    "playlists": [{ "id": "2GflHCKSH0uhzacsAxUKhn", "name": "cover of vogue" }],
+    "_note": "Covers: comma directly touching a match word ('clear,'), case-insensitivity ('Skin' vs query 'skin'), a hyphen acting as a word separator ('Iced-out' -> query 'iced out' should match), a repeated phrase for matchCount, a numeric token ('2012' is a searchable word), overlapping sliding-window matches ('pop-pop-pop' -> 3 consecutive 'pop' tokens, so query 'pop pop' should produce 2 overlapping matches), a 3-artist song, and a combined-filter case -- playlist='cover of vogue' AND artist='BAYLI' AND album='POP GIRLS CLUB' should all be satisfiable together on this one track."
+  },
+  {
+    "id": "51RDaTRAEHSitpeucJiHyU",
+    "name": "FIND GOD (feat. Dominic Fike)",
+    "artists": ["Kenny Mason", "Dominic Fike"],
+    "album": "BULLDAWG",
+    "duration_ms": 239120,
+    "spotifyUrl": "https://open.spotify.com/track/51RDaTRAEHSitpeucJiHyU",
+    "liked": true,
+    "playlists": [],
+    "_note": "Lyrics are null (real track where LRCLIB had no match) -- this should still be findable via a TITLE-only match, e.g. query 'find god'. Also: artist filter should match on the SECOND artist ('Dominic Fike'), not just the first."
+  },
+  {
+    "id": "1YLJVmuzeM2YSUkCCaTNUB",
+    "name": "Dog Days Are Over",
+    "artists": ["Florence + The Machine"],
+    "album": "Lungs (Deluxe Edition)",
+    "duration_ms": 251840,
+    "spotifyUrl": "https://open.spotify.com/track/1YLJVmuzeM2YSUkCCaTNUB",
+    "liked": false,
+    "playlists": [{ "id": "5ANu6xDrhXMaeNf5Trex39", "name": "dog days" }],
+    "_note": "liked:false -- should be EXCLUDED when scope='liked', but INCLUDED when playlist='dog days' (its actual playlist) or scope='spotify' (no restriction). Also a real artist name with punctuation ('Florence + The Machine') for the artist filter."
+  },
+  {
+    "id": "1wUnuiXMMvhudmzvcCtlZP",
+    "name": "Get Up",
+    "artists": ["NewJeans"],
+    "album": "NewJeans 2nd EP 'Get Up'",
+    "duration_ms": 36226,
+    "spotifyUrl": "https://open.spotify.com/track/1wUnuiXMMvhudmzvcCtlZP",
+    "liked": true,
+    "playlists": [],
+    "_note": "DECOY -- deliberately shares no vocabulary with any of the other fixtures' test queries (beg, love, dog days, pop, skin, iced, petal, paradise, god, etc). Exists purely as a negative control: it should never appear in results for any of the other test cases' queries, catching a filter bug that accidentally returns everything."
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "3Wrjm47oTz2sjIgck11l5e": {
+    "title": "Beggin'",
+    "artist": "Måneskin",
+    "matchedTitle": "Beggin'",
+    "matchedArtist": "Måneskin",
+    "lyrics": "Put your loving hand out, baby\n'Cause I'm beggin'\n\nI'm beggin', beggin' you",
+    "_note": "Trimmed from the real lyrics. 'beggin'' (with trailing apostrophe) is the literal token here."
+  },
+  "11M8c9SHQYpd8DOrmcu25k": {
+    "title": "Beg for You (feat. Rina Sawayama)",
+    "artist": "Charli xcx",
+    "matchedTitle": "Beg for You (feat. Rina Sawayama)",
+    "matchedArtist": "Charli xcx",
+    "lyrics": "Don't make me beg for you ('cause I'll beg for you)\n\nBeg for you, beg for you (yeah)",
+    "_note": "Trimmed from the real lyrics. 'beg' appears standalone (no apostrophe) 4 times total, with parentheses directly touching some occurrences."
+  },
+  "70pVCVMGjmIWPbWXDwf11e": {
+    "title": "petal",
+    "artist": "Ariana Grande",
+    "matchedTitle": "petal",
+    "matchedArtist": "Ariana Grande",
+    "lyrics": "To cry again\nThey say the artist needs tears\nBut I don't need someone to save me\nPetal in the pavement\nHeartbreak won't bite\nHere in paradise\nPetal in the pavement\nHeartbreak won't bite\nThis is paradise",
+    "_note": "Trimmed (non-contiguous lines joined) from the real lyrics, preserving the exact line breaks the line-break and non-adjacency test cases depend on. 'Petal in the pavement' repeats twice, matching the title 'petal'."
+  },
+  "1Gc4HLasqihMmsAJQacNuO": {
+    "title": "POP GIRL (with BAYLI & Isabella Lovestory)",
+    "artist": "Lexie Liu",
+    "matchedTitle": "POP GIRL (with BAYLI & Isabella Lovestory)",
+    "matchedArtist": "Lexie Liu",
+    "lyrics": "Skin clear, hair shiny\nGirls and gays like me\n\nSkin clear, hair shiny\nGirls and gays like me\n\nIced-out Bebe Pop my hips Prada fit\nOn my pop-pop-pop bitch 2012",
+    "_note": "Trimmed (non-contiguous lines joined) from the real lyrics. Repeats the opening couplet once (for matchCount=2), keeps the hyphenated 'Iced-out', and keeps 'pop-pop-pop bitch 2012' for the numeric-token and overlapping-match cases."
+  },
+  "51RDaTRAEHSitpeucJiHyU": {
+    "title": "FIND GOD (feat. Dominic Fike)",
+    "artist": "Kenny Mason",
+    "lyrics": null,
+    "_note": "Real entry: LRCLIB had no lyrics match for this track, so it's null exactly as it appears in a real synced library."
+  },
+  "1YLJVmuzeM2YSUkCCaTNUB": {
+    "title": "Dog Days Are Over",
+    "artist": "Florence + The Machine",
+    "matchedTitle": "Dog Days Are Over",
+    "matchedArtist": "Florence + The Machine",
+    "lyrics": "The dog days are over\nThe dog days are done\nThe horses are coming\nSo you better run",
+    "_note": "Trimmed from the real opening chorus."
+  },
+  "1wUnuiXMMvhudmzvcCtlZP": {
+    "title": "Get Up",
+    "artist": "NewJeans",
+    "matchedTitle": "Get Up",
+    "matchedArtist": "NewJeans",
+    "lyrics": "Get up\nI don't wanna fight your shadow\nMeet me back in five if I matter\nTo you\nLike you say I do",
+    "_note": "DECOY. Trimmed from the real opening lines -- deliberately vocabulary-disjoint from every other fixture's test queries."
+  }
+}

@@ -1,73 +1,3 @@
-// Demo data. Your backend will later replace this with Spotify/lyrics results.
-const songs = [
-  {
-    title: "Love Me Like You Do",
-    artist: "Ellie Goulding",
-    album: "Fifty Shades of Grey (Original Motion Picture Soundtrack)",
-    lyric: "You're the love of my life, you're the air that I breathe...",
-    duration: "4:12",
-    cover: "♡",
-    liked: true,
-    playlists: [{ id: "demo-main-character", name: "Main Character" }]
-  },
-  {
-    title: "All of Me",
-    artist: "John Legend",
-    album: "Love in the Future",
-    lyric: "'Cause all of me loves all of you",
-    duration: "4:29",
-    cover: "☾",
-    liked: true,
-    playlists: [{ id: "demo-chill", name: "Chill Mix" }]
-  },
-  {
-    title: "Lover",
-    artist: "Taylor Swift",
-    album: "Lover",
-    lyric: "Can I go where you go? Can we always be this close forever?",
-    duration: "3:41",
-    cover: "🌸",
-    liked: true,
-    playlists: [{ id: "demo-main-character", name: "Main Character" }]
-  },
-  {
-    title: "The Night We Met",
-    artist: "Lord Huron",
-    album: "Strange Trails",
-    lyric: "I had all and then most of you, some and now none of you",
-    duration: "3:28",
-    cover: "☁",
-    liked: false,
-    playlists: [
-      { id: "demo-study", name: "Study Playlist" },
-      { id: "demo-chill", name: "Chill Mix" }
-    ]
-  },
-  {
-    title: "Dreams",
-    artist: "Fleetwood Mac",
-    album: "Rumours",
-    lyric: "Thunder only happens when it's raining, players only love you when they're playing",
-    duration: "4:17",
-    cover: "✦",
-    liked: false,
-    playlists: [
-      { id: "demo-summer", name: "Summer Songs" },
-      { id: "demo-chill", name: "Chill Mix" }
-    ]
-  },
-  {
-    title: "Goodbye",
-    artist: "Mimi Webb",
-    album: "Amelia",
-    lyric: "This is goodbye, but I still hear your name in every song",
-    duration: "3:02",
-    cover: "🌙",
-    liked: false,
-    playlists: [{ id: "demo-main-character", name: "Main Character" }]
-  }
-];
-
 const scopeNames = {
   spotify: "All Spotify",
   liked: "Liked Songs"
@@ -83,18 +13,23 @@ const scopeSelect = document.getElementById("scopeSelect");
 const artistFilterInput = document.getElementById("artistFilter");
 const albumFilterInput = document.getElementById("albumFilter");
 const filterSummary = document.getElementById("filterSummary");
+const pagination = document.getElementById("pagination");
+
+const PAGE_SIZE = 15;
 
 let currentSearch = searchInput.value;
 let currentPlaylist = "spotify";
 let currentArtist = "";
 let currentAlbum = "";
+let latestMatches = [];
+let currentPage = 1;
 
 const SEARCH_DEBOUNCE_MS = 250;
 let searchDebounceTimer = null;
 
 async function loadPlaylists() {
   try {
-    const res = await fetch("../data/playlists.json");
+    const res = await fetch("/api/playlists");
     if (!res.ok) throw new Error(`Failed to load playlists (${res.status})`);
     const playlists = await res.json();
 
@@ -115,9 +50,23 @@ function escapeRegExp(text) {
 }
 
 function highlight(text, searchTerm) {
-  if (!searchTerm) return text;
-  const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, "gi");
+  // Mirror the server's tokenizing: pull out just the words from the
+  // query so stray punctuation in what the user typed (e.g. "love,")
+  // doesn't turn into a literal character the snippet must also contain.
+  const words = searchTerm.match(/[a-z0-9']+/gi) || [];
+  if (words.length === 0) return text;
+
+  const pattern = words.map(escapeRegExp).join("[^a-zA-Z0-9']+");
+  const regex = new RegExp(`(${pattern})`, "gi");
   return text.replace(regex, "<mark>$1</mark>");
+}
+
+function formatDuration(ms) {
+  if (!ms) return "";
+  const totalSeconds = Math.round(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 function updateClearButton() {
@@ -132,31 +81,6 @@ function updateFilterSummary() {
   scopeSelect.value = currentPlaylist;
 }
 
-function getMatches() {
-  const term = currentSearch.trim().toLowerCase();
-  const artistTerm = currentArtist.trim().toLowerCase();
-  const albumTerm = currentAlbum.trim().toLowerCase();
-  if (!term) return [];
-
-  return songs.filter(song => {
-    const inPlaylist =
-      currentPlaylist === "spotify" ||
-      (currentPlaylist === "liked"
-        ? song.liked
-        : song.playlists.some(p => p.id === currentPlaylist));
-
-    const matchesArtist = !artistTerm || song.artist.toLowerCase().includes(artistTerm);
-    const matchesAlbum = !albumTerm || (song.album ?? "").toLowerCase().includes(albumTerm);
-
-    const containsSearch =
-      song.lyric.toLowerCase().includes(term) ||
-      song.title.toLowerCase().includes(term) ||
-      song.artist.toLowerCase().includes(term);
-
-    return inPlaylist && matchesArtist && matchesAlbum && containsSearch;
-  });
-}
-
 function sortMatches(matches) {
   if (sortSelect.value === "title") {
     return [...matches].sort((a, b) => a.title.localeCompare(b.title));
@@ -169,9 +93,32 @@ function sortMatches(matches) {
   return matches;
 }
 
-function render() {
+function renderPagination(totalPages) {
+  if (totalPages <= 1) {
+    pagination.innerHTML = "";
+    return;
+  }
+
+  pagination.innerHTML = `
+    <button type="button" id="prevPage" ${currentPage <= 1 ? "disabled" : ""}>‹ Prev</button>
+    <span>Page ${currentPage} of ${totalPages}</span>
+    <button type="button" id="nextPage" ${currentPage >= totalPages ? "disabled" : ""}>Next ›</button>
+  `;
+
+  document.getElementById("prevPage").addEventListener("click", () => {
+    currentPage = Math.max(1, currentPage - 1);
+    renderResults();
+  });
+
+  document.getElementById("nextPage").addEventListener("click", () => {
+    currentPage = Math.min(totalPages, currentPage + 1);
+    renderResults();
+  });
+}
+
+function renderResults() {
   const term = currentSearch.trim();
-  const matches = sortMatches(getMatches());
+  const matches = sortMatches(latestMatches);
 
   resultCount.textContent =
     `${matches.length} ${matches.length === 1 ? "song" : "songs"} found`;
@@ -182,6 +129,7 @@ function render() {
         Type a word or phrase to search ${filterSummary.textContent}.
       </div>
     `;
+    pagination.innerHTML = "";
     return;
   }
 
@@ -191,29 +139,63 @@ function render() {
         No songs found for “${term}” in ${filterSummary.textContent}.
       </div>
     `;
+    pagination.innerHTML = "";
     return;
   }
 
-  results.innerHTML = matches.map(song => `
+  const totalPages = Math.ceil(matches.length / PAGE_SIZE);
+  currentPage = Math.min(currentPage, totalPages);
+  const pageMatches = matches.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  results.innerHTML = pageMatches.map(song => `
     <article class="song-card">
-      <div class="cover">${song.cover}</div>
+      <div class="cover">${song.title.charAt(0).toUpperCase()}</div>
 
       <div>
         <h3 class="song-title">${song.title}</h3>
         <p class="artist">${song.artist}</p>
+        ${song.album ? `<p class="album">${song.album}</p>` : ""}
       </div>
 
-      <p class="lyric">${highlight(song.lyric, term)}</p>
-      <span class="duration">${song.duration}</span>
-      <button class="play-btn" type="button" aria-label="Play ${song.title}">▶</button>
+      <p class="lyric">${highlight(song.snippet ?? "", term)}</p>
+      <span class="duration">${formatDuration(song.duration_ms)}</span>
+      <a class="play-btn" href="${song.spotifyUrl ?? "#"}" target="_blank" rel="noopener" aria-label="Open ${song.title} on Spotify">▶</a>
     </article>
   `).join("");
+
+  renderPagination(totalPages);
+}
+
+async function runSearch() {
+  currentPage = 1;
+  const term = currentSearch.trim();
+  if (!term) {
+    latestMatches = [];
+    renderResults();
+    return;
+  }
+
+  const params = new URLSearchParams({ q: term });
+  if (currentPlaylist && currentPlaylist !== "spotify") params.set("playlist", currentPlaylist);
+  if (currentArtist.trim()) params.set("artist", currentArtist.trim());
+  if (currentAlbum.trim()) params.set("album", currentAlbum.trim());
+
+  try {
+    const res = await fetch(`/api/search?${params}`);
+    if (!res.ok) throw new Error(`Search failed (${res.status})`);
+    latestMatches = await res.json();
+  } catch (err) {
+    console.error("Search error:", err);
+    latestMatches = [];
+  }
+
+  renderResults();
 }
 
 function applySearchNow() {
   clearTimeout(searchDebounceTimer);
   currentSearch = searchInput.value;
-  render();
+  runSearch();
 }
 
 searchForm.addEventListener("submit", event => {
@@ -237,28 +219,31 @@ clearButton.addEventListener("click", () => {
 scopeSelect.addEventListener("change", () => {
   currentPlaylist = scopeSelect.value;
   updateFilterSummary();
-  render();
+  runSearch();
 });
 
 artistFilterInput.addEventListener("input", () => {
   currentArtist = artistFilterInput.value;
   updateFilterSummary();
-  render();
+  runSearch();
 });
 
 albumFilterInput.addEventListener("input", () => {
   currentAlbum = albumFilterInput.value;
   updateFilterSummary();
-  render();
+  runSearch();
 });
 
-sortSelect.addEventListener("change", render);
+sortSelect.addEventListener("change", () => {
+  currentPage = 1;
+  renderResults();
+});
 
 async function init() {
   await loadPlaylists();
   updateClearButton();
   updateFilterSummary();
-  render();
+  runSearch();
 }
 
 init();
