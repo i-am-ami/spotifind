@@ -12,6 +12,7 @@
     "server": "node backend/server.js",
     "test:search": "node --test tests/search.test.js",
     "test:server": "node --test tests/server.test.js tests/server-errors.test.js tests/server-malformed-playlists.test.js",
+    "test:lrclib": "node --test tests/lrclib.test.js",
     "test:search:log": "bash scripts/run-tests.sh search tests/search.test.js",
     "test:server:log": "bash scripts/run-tests.sh server tests/server.test.js tests/server-errors.test.js tests/server-malformed-playlists.test.js"
   },

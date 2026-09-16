@@ -33,6 +33,8 @@ function loadJson(path, fallback) {
  * - matchedTitle: the track name returned by LRCLIB (may differ in capitalization, punctuation, etc.)
  * - matchedArtist: the artist name returned by LRCLIB (may differ in capitalization, punctuation, etc.)
  * - lyrics: the plain text lyrics returned by LRCLIB, or null if no lyrics were found
+ * - syncedLyrics: an array of { time, text } line-synced lyrics parsed from LRCLIB's
+ *   LRC data, or null if none was available
  * @param {} lyricsMap 
  */
 function saveLyrics(lyricsMap) {
@@ -68,6 +70,7 @@ async function main() {
           matchedTitle: result.matchedTitle,
           matchedArtist: result.matchedArtist,
           lyrics: result.lyrics,
+          syncedLyrics: result.syncedLyrics,
         };
 		console.log(`Lyrics found: "${track.name}" - ${artist} (matched: "${result.matchedTitle}" - ${result.matchedArtist})`);
         found++;
