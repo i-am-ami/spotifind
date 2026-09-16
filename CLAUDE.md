@@ -41,7 +41,7 @@ npm run test:lrclib    # backend/lrclib.js fetch + LRC parsing (17 cases)
 Run a single file directly: `node --test tests/search.test.js`
 Run a single case by name: `node --test --test-name-pattern="prefix matching" tests/search.test.js`
 
-`npm run test:search:log` / `test:server:log` also tee full output to `tests/logs/` (gitignored) and append a one-line summary to `tests/test-log.md` (tracked) — see `scripts/run-tests.sh`.
+`npm run test:search:log` / `test:server:log` / `test:lrclib:log` also tee full output plus a per-run JUnit XML to `tests/logs/` (gitignored), and append one line to both `tests/test-log.md` (tracked, human-readable) and `tests/test-log.jsonl` (tracked, one JSON record per run — `timestamp`, `suite`, `total`/`pass`/`fail`/`skipped`, `duration_ms`, `exit_code`, `status`, `log_file`, `xml_file`, `commit`) — see `scripts/run-tests.sh`.
 
 Each test suite has a companion "gold" spec written as a markdown table (test case → input → expected → reasoning): `tests/fixtures/fixtures_gold.md`, `tests/server_test_gold.md`, `tests/lrclib_test_gold.md`. Check these first when adding a case -- they're the source of truth for *why* a case exists, not just what it asserts.
 
